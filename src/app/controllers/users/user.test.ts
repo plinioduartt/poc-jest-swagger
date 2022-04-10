@@ -1,7 +1,18 @@
 import request from 'supertest';
 import app from '../../../app';
+import { Users } from '../../../infra/database/entities/users/user';
+import database from '../../../infra/database/connection';
+import { v4 as uuidv4 } from 'uuid';
 
 describe('USER CONTROLLER', function () {
+  // beforeAll(async () => {
+  //   await database.getRepository(Users).clear();
+  // });
+
+  // afterAll(async () => {
+  //   await database.getRepository(Users).clear();
+  // });
+
   it('GET /users ==> should return an array list', async () => {
     const response = await request(app)
       .get('/users')
@@ -33,14 +44,31 @@ describe('USER CONTROLLER', function () {
   });
 
   it('POST /users ==> should create a new user', async () => {
+    const _uuid = uuidv4();
     const response = await request(app)
       .post(`/users`)
-      .send({ name: "Plinio Duarte", email: "plinio.duartes@hotmail.com" })
+      .send({ name: `teste-${_uuid}`, email: `teste-${_uuid}@email.com` })
       .set('Accept', 'application/json');
 
     expect(response.status).toBe(200);
     expect(JSON.parse(response.text)).toHaveProperty('user');
-    expect(JSON.parse(response.text).user.name).toBe('Plinio Duarte');
+    expect(JSON.parse(response.text).user.name).toBe(`teste-${_uuid}`);
+  });
+
+  it('POST /users ==> should return email already exists error', async () => {
+    const _USER_ID = 1;
+    const _alreadyRegistered = await request(app)
+      .get(`/users/${_USER_ID}`)
+      .set('Accept', 'application/json');
+    const _parsedData = JSON.parse(_alreadyRegistered.text);
+
+    const response = await request(app)
+      .post(`/users`)
+      .send({ name: "Plinio Duarte", email: _parsedData?.user?.email })
+      .set('Accept', 'application/json');
+
+    expect(response.status).not.toBe(200);
+    expect(response.status).toBe(400);
   });
 
   it('PATCH /users/{id} ==> should update attributes of a specific user', async () => {

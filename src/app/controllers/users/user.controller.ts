@@ -5,7 +5,8 @@ import { IUserService } from "~/domain/users/services/user.interface";
 export class UserController {
   private readonly _service: IUserService;
   private readonly _customErrorStatusCode: any = {
-    'Not found.': 404
+    'Not found.': 404,
+    'Email already exists.': 400
   }
 
   constructor(serviceInstance: IUserService) {

@@ -5,7 +5,7 @@ import { IUserRepository } from "./user.interface";
 
 export class MockUserRepository implements IUserRepository {
   private readonly _users: User[] = [
-    { id: '1', name: "Plinio", email: "plinio@gmail.com" },
+    { id: '1', name: "Plinio", email: "plinio.duartes@hotmail.com" },
     { id: '2', name: "Joan", email: "joan@gmail.com" },
   ];
 
@@ -16,6 +16,12 @@ export class MockUserRepository implements IUserRepository {
   }
 
   async create(data: CreateUserDto) {
+    const foundUsers = this._users.filter((item: User) => item?.email === data.email);
+
+    if (foundUsers && foundUsers.length > 0) {
+      throw new Error('Email already exists.');
+    }
+
     const newUser: User = { ...data, id: JSON.stringify(++this._users.length) };
     this._users.push(newUser);
     return newUser;

@@ -7,7 +7,7 @@ import database from '../../connection';
 import { Users } from "../../entities/users/user";
 
 export class UserRepository implements IUserRepository {
-  
+
   constructor() { }
 
   async list(): Promise<User[]> {
@@ -15,6 +15,18 @@ export class UserRepository implements IUserRepository {
   }
 
   async create(data: CreateUserDto): Promise<User> {
+    const _userExists = await database
+      .getRepository(Users)
+      .findOne({
+        where: {
+          email: data.email
+        }
+      });
+
+    if (_userExists) {
+      throw new Error('Email already exists.');
+    }
+
     const user = await database
       .createQueryBuilder()
       .insert()

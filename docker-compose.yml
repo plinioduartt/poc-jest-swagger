@@ -14,8 +14,8 @@ services:
     ports:
       - "${DB_PORT}:3306"
     volumes:
-      # - "db_volume:${VOLUME_PATH}"
-      - ./src/infra/database/configs:/docker-entrypoint-initdb.d
+      - "db_volume:${VOLUME_PATH}"
+      - ./src/infra/database/configs:/docker-entrypoint-initdb.d  # OBS: Esta linha inicializa um script de criação da database de teste, localizado na ./src/infra/database/configs, o mesmo precisa ter o nome igual da variável de ambiente .env.test DB_DATABASE
     env_file:
       - .env
 
